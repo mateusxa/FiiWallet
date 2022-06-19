@@ -26,6 +26,9 @@ def shell_context_processor():
         user_fiis=user_fiis,
     )
 
+@app.route('/')
+def home():
+    return "Hello World!"
 
 if __name__ == '__name__':
     app.run()
