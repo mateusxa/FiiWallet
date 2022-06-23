@@ -1,6 +1,6 @@
 import json
 from operator import and_
-from sqlalchemy import null
+from sqlalchemy import desc, null
 import scripts.fii as Fii_Data
 from flask import jsonify, request
 import datetime
@@ -59,7 +59,7 @@ def login():
     return jsonify({"token": token})
 
 
-@app.route('/auth/get_fiis')
+@app.route('/auth/fiis/all')
 @jwt_required
 def get_fiis(current_user):
 
@@ -92,7 +92,7 @@ def get_fiis(current_user):
     return jsonify(result_list)
 
 
-@app.route('/auth/register_fiis', methods=["POST"])
+@app.route('/auth/fiis', methods=["POST"])
 @jwt_required
 def register_fiis(current_user):
     fii_code_request = request.json['fii_code']
@@ -118,6 +118,29 @@ def register_fiis(current_user):
 
     ticket = user_fii_share_schema.dump(
         UserFII.query.filter(UserFII.user_id == current_user.id and UserFII.fii_code==fii_code_request and UserFII.created==date).first()
+    )
+
+    result = {
+        "tickect_qtd": quantity_request,
+        "ticket": ticket
+    }
+
+    return jsonify(result)
+
+
+@app.route('/auth/fiis', methods=["DELETE"])
+@jwt_required
+def delete_fiis(current_user):
+    fii_code_request = request.json['fii_code']
+    quantity_request = request.json['quantity']
+
+    for _ in range(quantity_request):
+        user_fii = UserFII.query.filter_by(fii_code=fii_code_request).delete()
+
+        db.session.commit()
+
+    ticket = user_fii_share_schema.dump(
+        UserFII.query.filter(UserFII.user_id == current_user.id and UserFII.fii_code==fii_code_request).first()
     )
 
     result = {
