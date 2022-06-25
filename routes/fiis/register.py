@@ -3,8 +3,7 @@ from flask import jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import app, db
-from app.FIIs import FIIs, fii_share_schema, fiis_share_schema
-from authenticate import jwt_required
+from app.FIIs import FIIs, fii_share_schema
 
 
 @app.route('/fiis/register', methods=['POST'])

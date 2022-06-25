@@ -1,102 +1,12 @@
-from operator import and_
-from sqlalchemy.exc import SQLAlchemyError
-import scripts.fii as Fii_Data
-from flask import jsonify, request
-import datetime
-import time
-
-import datetime
-import jwt
-
 from app import app, db
 from app.UserFIIs import UserFII, user_fii_share_schema
-from app.Users import User, user_share_schema
-from app.FIIs import FIIs, fii_share_schema
+from app.FIIs import FIIs
+from flask import jsonify, request
 from authenticate import jwt_required
 
+import datetime
+import scripts.fii as Fii_Data
 
-@app.route('/auth/register', methods=['POST'])
-def register():
-    username = request.json['username']
-    email = request.json['email']
-    password = request.json['password']
-
-    try:
-        user = User(
-            username,
-            email,
-            password
-        )
-
-        db.session.add(user)
-        db.session.commit()
-
-        result = user_share_schema.dump(
-            User.query.filter_by(email=email).first()
-        )
-
-    except SQLAlchemyError as e:
-        error = str(e.__dict__['orig'])
-        error = error.lstrip("(").rstrip(")")
-
-        payload = {
-            "errorCode": error[0:4],
-            "errorMessage": error[7:-1]
-        }
-        return jsonify(payload), 400
-
-    return jsonify(result)
-
-
-@app.route('/auth/login', methods=["POST"])
-def login():
-    email = request.json['email']
-    password = request.json['password']
-
-    for _ in range(3):
-        try:
-            user = User.query.filter_by(email=email).first_or_404()
-        
-            if not user.verify_password(password):
-                return jsonify({
-                    "error": "suas credenciais estao erradas!"
-                }), 403
-
-            payload = {
-                "id": user.id,
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-            }
-
-            token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-            
-            return jsonify({"token": token})
-        except SQLAlchemyError as e:
-            error = str(e.__dict__['orig'])
-            error = error.lstrip("(").rstrip(")")
-
-            error_code = error[0:4]
-
-            if error_code == "2013":
-                session_clear()
-                pass
-            else:
-                payload = {
-                    "errorCode": error_code,
-                    "errorMessage": error[7:-1]
-                }
-                return jsonify(payload), 400
-
-    return jsonify({
-        "errorCode": "0000",
-        "errorMessage": "Server may be down"
-    })
-
-
-@app.teardown_request
-def session_clear(exception=None):
-    db.session.remove()
-    if exception and db.session.is_active:
-        db.session.rollback()
 
 
 @app.route('/auth/fiis/all')

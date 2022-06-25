@@ -9,10 +9,12 @@ CORS(app)
 
 Migrate(app, db)
 
-import routes.auth
-import routes.fiis
+import routes.auth.fiis
+import routes.auth.login
+import routes.auth.register
+import routes.fiis.register
 
-update_all()
+# update_all()
 
 sched = BackgroundScheduler(daemon=True)
 sched.add_job(update_all,'interval',hours=1)
