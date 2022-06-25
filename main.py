@@ -12,8 +12,10 @@ Migrate(app, db)
 import routes.auth
 import routes.fiis
 
+update_all()
+
 sched = BackgroundScheduler(daemon=True)
-sched.add_job(update_all,'interval',minutes=10)
+sched.add_job(update_all,'interval',hours=1)
 sched.start()
 
 @app.shell_context_processor

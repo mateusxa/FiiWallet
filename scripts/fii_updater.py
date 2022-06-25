@@ -6,8 +6,8 @@ from app import db
 def update_fii(value):
 
     fii_code = value
-    stock_price, daily_liquidity, last_yield, dividend_yield, liquid_assets, month_prof, \
-    patrimonial_value, p_vp = Fii_Data.get_fii_data(fii_code)
+    stock_price, daily_liquidity, last_yield, dividend_yield, liquid_assets, patrimonial_value, \
+    month_prof, p_vp = Fii_Data.get_fii_data(fii_code)
 
     update = FIIs.query.filter_by(fii_code=value).first()
 
