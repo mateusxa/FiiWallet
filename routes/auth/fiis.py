@@ -48,6 +48,19 @@ def register_fiis(current_user):
     fii_code_request = request.json['fii_code']
     quantity_request = request.json['quantity']
     date = datetime.datetime.utcnow()
+
+    if not isinstance(quantity_request, int):
+        return jsonify({
+            "errorCode": "0000",
+            "errorMessage": "Quantity must be an integer"
+        }), 400
+
+    if not isinstance(fii_code_request, str):
+        return jsonify({
+            "errorCode": "0000",
+            "errorMessage": "Fii code must be an string"
+        }), 400
+
     fii = FIIs.query.filter_by(fii_code=fii_code_request).first()
 
     if fii is None:

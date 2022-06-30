@@ -18,7 +18,8 @@ def login():
         
             if not user.verify_password(password):
                 return jsonify({
-                    "error": "suas credenciais estao erradas!"
+                    "errorCode": "0000",
+                    "errorMessage": "Invalid Credentials"
                 }), 403
 
             payload = {
