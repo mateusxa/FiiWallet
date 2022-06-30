@@ -24,7 +24,7 @@ def jwt_required(f):
             decoded = jwt.decode(token_pure, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query.get(decoded['id'])
         except:
-            return jsonify({"error": "token invalido"})
+            return jsonify({"error": "token invalido"}), 400
 
         return f(current_user=current_user, *args, **kwargs)
 
