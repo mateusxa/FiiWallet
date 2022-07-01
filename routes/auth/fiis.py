@@ -9,7 +9,7 @@ import scripts.fii as Fii_Data
 
 
 
-@app.route('/auth/fiis/all')
+@app.route('/auth/fiis')
 @jwt_required
 def get_fiis(current_user):
 
