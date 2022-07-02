@@ -9,7 +9,7 @@ CORS(app)
 
 Migrate(app, db)
 
-import routes.auth.fiis
+from routes.auth.fii import get, post, delete
 import routes.auth.login
 import routes.auth.register
 import routes.fiis.register
