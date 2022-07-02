@@ -1,12 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from utils import parse_percent, parse_real
 
-def parse_list(parse_item):
-    return parse_item.replace("\n", "").strip() \
-        .replace("                ", "|") \
-        .replace("              ", "|") \
-        .split("|")
 
 def get_fii_data(fii):
     raw_data = requests.get("https://www.fundsexplorer.com.br/funds/" + fii).content
@@ -44,3 +38,35 @@ def serialize_data(fii_data):
         stock_price, daily_liquidity, last_yield, dividend_yield, liquid_assets, 
         patrimonial_value, month_prof, p_vp
     )
+
+
+def parse_real(value):
+
+    parsed_value = value
+
+    try:
+        parsed_value = float(str(value[3:]).replace(",", '.'))
+    except:
+        if(value[-3] == " "):
+            unit = value[-2:]
+            if(unit == 'bi'):
+                value = value[:-3]
+                parsed_value = float(str(value[3:]).replace(",", '.')) * 10**9
+            
+            elif(unit == 'mi'):
+                value = value[:-3]
+                parsed_value = float(str(value[3:]).replace(",", '.')) * 10**6
+
+            else:
+                parsed_value = "error" + str(value)
+
+    return parsed_value
+
+def parse_percent(value):
+    return float(str(value.strip('%').replace(",", '.')))
+
+def parse_list(parse_item):
+    return parse_item.replace("\n", "").strip() \
+        .replace("                ", "|") \
+        .replace("              ", "|") \
+        .split("|")

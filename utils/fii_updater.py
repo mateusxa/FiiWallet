@@ -1,5 +1,5 @@
 from app.FIIs import FIIs
-import scripts.fii as Fii_Data
+import utils.fii as Fii_Data
 from app import db
 
 

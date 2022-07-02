@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from scripts.fii_updater import update_all
+from utils.fii_updater import update_all
 from flask_migrate import Migrate
 from flask_cors import CORS
 

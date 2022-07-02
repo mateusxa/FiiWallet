@@ -1,4 +1,4 @@
-import scripts.fii as Fii_Data
+import utils.fii as Fii_Data
 from flask import jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
 

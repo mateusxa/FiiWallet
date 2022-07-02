@@ -3,9 +3,10 @@ from app.UserFIIs import UserFII, user_fii_share_schema
 from app.FIIs import FIIs
 from flask import jsonify, request
 from authenticate import jwt_required
+from utils.check import is_type
 
 import datetime
-import scripts.fii as Fii_Data
+import utils.fii as Fii_Data
 
 @app.route('/auth/fii', methods=["POST"])
 @jwt_required
@@ -14,17 +15,8 @@ def register_fiis(current_user):
     quantity_request = request.json['quantity']
     date = datetime.datetime.utcnow()
 
-    if not isinstance(quantity_request, int):
-        return jsonify({
-            "errorCode": "0000",
-            "errorMessage": "Quantity must be an integer"
-        }), 400
-
-    if not isinstance(fii_code_request, str):
-        return jsonify({
-            "errorCode": "0000",
-            "errorMessage": "Fii code must be an string"
-        }), 400
+    is_type(quantity_request, int)
+    is_type(fii_code_request, str)
 
     fii = FIIs.query.filter_by(fii_code=fii_code_request).first()
 
@@ -37,7 +29,6 @@ def register_fiis(current_user):
 
         db.session.add(fii)
 
-    for _ in range(quantity_request):
         user_fii = UserFII(current_user.id, fii_code_request, date)
     
         db.session.add(user_fii)
@@ -54,3 +45,5 @@ def register_fiis(current_user):
     }
 
     return jsonify(result)
+
+

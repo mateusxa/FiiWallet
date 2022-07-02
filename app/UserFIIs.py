@@ -6,20 +6,20 @@ class UserFII(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.String(84), nullable=False)
     fii_code = db.Column(db.String(84), nullable=False)
-    created = db.Column(db.DateTime)
+    quantity = db.Column(db.Integer)
 
-    def __init__(self, user_id, fii_code, created):
+    def __init__(self, user_id, fii_code, quantity):
         self.user_id = user_id
         self.fii_code = fii_code
-        self.created = created
+        self.quantity = quantity
 
     def __repr__(self):
-        return f"<User : {self.user_id}, {self.fii_code}, {self.created} >"
+        return f"<User : {self.user_id}, {self.fii_code}, {self.quantity} >"
 
 
 class UserFIISchema(ma.Schema):
     class Meta:
-        fields = ('id', 'user_id', 'fii_code', 'created')
+        fields = ('id', 'user_id', 'fii_code', 'quantity')
 
 
 user_fii_share_schema = UserFIISchema()

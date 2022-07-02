@@ -1,3 +1,4 @@
+from sqlalchemy import table
 from app import app, db
 from app.UserFIIs import UserFII, user_fii_share_schema
 from flask import jsonify, request
@@ -9,18 +10,16 @@ def delete_fiis(current_user):
     fii_code_request = request.json['fii_code']
     quantity_request = request.json['quantity']
 
-    for _ in range(quantity_request):
-        user_fii = UserFII.query.filter_by(fii_code=fii_code_request).delete()
+    # for _ in range(quantity_request):
 
-        db.session.commit()
+    obj = UserFII.query.filter(UserFII.fii_code==fii_code_request and UserFII.user_id == current_user.id).first() #.order_by(UserFII.user_id.desc()).first()  #.first()
+    db.session.delete(obj)
+    db.session.commit()
 
-    ticket = user_fii_share_schema.dump(
-        UserFII.query.filter(UserFII.user_id == current_user.id and UserFII.fii_code==fii_code_request).first()
-    )
 
     result = {
         "tickect_qtd": quantity_request,
-        "ticket": ticket
+        "ticket": "ticket"
     }
 
     return jsonify(result)
