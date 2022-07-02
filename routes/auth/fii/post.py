@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from app import app, db
 from app.UserFIIs import UserFII, user_fii_share_schema
 from app.FIIs import FIIs
@@ -13,10 +14,19 @@ import utils.fii as Fii_Data
 def register_fiis(current_user):
     fii_code_request = request.json['fii_code']
     quantity_request = request.json['quantity']
-    date = datetime.datetime.utcnow()
 
     is_type(quantity_request, int)
-    is_type(fii_code_request, str)
+    if not isinstance(quantity_request, int):
+        return jsonify({
+            "errorCode": "0000",
+            "errorMessage": "Quantity must be an integer"
+        }), 400
+        
+    if not isinstance(fii_code_request, str):
+        return jsonify({
+            "errorCode": "0000",
+            "errorMessage": "Fii code must be an string"
+        }), 400
 
     fii = FIIs.query.filter_by(fii_code=fii_code_request).first()
 
@@ -29,20 +39,32 @@ def register_fiis(current_user):
 
         db.session.add(fii)
 
-        user_fii = UserFII(current_user.id, fii_code_request, date)
+        user_fii = UserFII(current_user.id, fii_code_request, quantity_request)
     
         db.session.add(user_fii)
 
         db.session.commit()
+    else:
+        user_fii = UserFII.query.filter(and_(UserFII.user_id == current_user.id, UserFII.fii_code==fii_code_request)).first()
+        
+        if user_fii is None:
+            user_fii = UserFII(
+                current_user.id,
+                fii_code_request,
+                quantity_request
+            )
 
-    ticket = user_fii_share_schema.dump(
-        UserFII.query.filter(UserFII.user_id == current_user.id and UserFII.fii_code==fii_code_request and UserFII.created==date).first()
+            db.session.add(user_fii)
+        else:
+            user_fii.quantity += quantity_request
+
+        db.session.commit()
+
+
+
+    result = user_fii_share_schema.dump(
+        UserFII.query.filter(and_(UserFII.user_id == current_user.id, UserFII.fii_code==fii_code_request)).first()
     )
-
-    result = {
-        "tickect_qtd": quantity_request,
-        "ticket": ticket
-    }
 
     return jsonify(result)
 

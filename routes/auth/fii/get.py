@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from app import app, db
 from app.UserFIIs import UserFII
 from app.FIIs import FIIs
@@ -9,14 +10,14 @@ from authenticate import jwt_required
 @jwt_required
 def get_fiis(current_user):
 
-    db_query_list = db.session.query(UserFII.fii_code, db.func.count(UserFII.user_id)).filter(UserFII.user_id == current_user.id).group_by(UserFII.fii_code).all()
-
+    db_query_list = UserFII.query.filter(UserFII.user_id == current_user.id).all()
+    
     result_list = []
 
     for db_query in db_query_list:
 
-        fii_code = db_query[0]
-        tickect_qtd = db_query[1]
+        fii_code = db_query.fii_code
+        tickect_qtd = db_query.quantity
 
         fii_code_query = FIIs.query.filter_by(fii_code=fii_code).first()
 
@@ -36,4 +37,3 @@ def get_fiis(current_user):
         result_list.append(d)
 
     return jsonify(result_list)
-
